@@ -71,7 +71,6 @@ class Sudoku extends Array {
 	
 	generateBoard(){
 		let clues = this.difineClues()
-		console.log(clues)
 		var i=0
 		for(; i<clues;i++){
 			let k = rand.next().value

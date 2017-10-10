@@ -7,13 +7,13 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 	$scope.selectedLevel = {
 		levels: $scope.levels[1]
 	}
-	
+	//alert(JSON.stringify(data[0].columns[3]))
 	function createEmptyRows() {
 		var rows = angular.copy(data);
 		for (var l=0; l<9; l++)
 			for(var c=0; c<9; c++){
 				rows[l].columns[c].value = "";
-				rows[l].columns[c].class = "";
+				rows[l].columns[c].class = "";	
 			}
 		return rows;
 	}
@@ -118,14 +118,21 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 	};
 	
 	$scope.generate = function(){
-	   $.ajax({url: '/api/generate', 
+	   $.ajax({url:'/api/generate', 
 			type:'POST',
-			body: { name : $("#inputName").val() }})
+			})
 			.done(function(result){
-				alert('SE GENERO CORRECTAMENTE',result)
+				var r = angular.copy(data);
+				for(var i=0;i<9;i++){
+					for (var j =0;j<9;j++){
+						if(result.sudoku[i][j]!=0)
+						r[i].columns[j].value = result.sudoku[i][j]
+					}
+				}
+				$scope.rows = r
 			})
 			 .fail(function(e, msg, excpn){
-				 alert('**** AJAX ERROR ' + msg + ' ****');
+				 alert('**** AJAX ERROR ' + msg + ' ****' );
 			});
 	};
 }); 

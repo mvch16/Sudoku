@@ -54,9 +54,9 @@ function test(){
 	}
 	
 	function isReady(){		
-		board.rows.forEach((e,i) => {
-			e.forEach((ej,j) => {				
-				 if(board.rows[i][j] == 0)
+			board.rows.forEach((e,i) => {
+				e.forEach((ej,j) => {				
+					 if(board.rows[i][j] == 0)
 					 return true
 			})
 		})	

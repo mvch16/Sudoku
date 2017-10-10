@@ -108,14 +108,11 @@ router.route('/sudoku/:sudoku_id')
 	
 router.route('/generate')
 	.post((req, res)=> {
-		console.log('POST requested: ' + req.body.name);
-		console.log('Post body ' + JSON.stringify(req.body))
-		let level = 1
+		let level = 3
 		let m = new emptyBoard()
 		let board = new Sudoku(m,1)
 		board.generateBoard()
-		//Aqui se resuelve el sudoku*/
-		res.json({ message: 'Sudoku generado', sudo:board.rows});
+		res.json({message:'Sudoku generado aleatoriamente',sudoku: board.rows});
 		});	
 
 ///////////////////////////////////////////////////////////////////////
