@@ -1,0 +1,1 @@
+curl -X POST -H "Content-Type: application/json" --data @sudoku.json http://localhost:8080/api/sudoku

@@ -89,8 +89,7 @@ class Sudoku extends Array {
 		let n = this.n / 3
 		let possibleValues = this.possibleValuesAt(i,j);
 		if (possibleValues.length == 1){
-			this.rows[i][j] = possibleValues[0]
-			return
+			return possibleValues[0]
 		}
 		
 		let [ib,jb] = this.squareCorner(i,j)
@@ -105,9 +104,10 @@ class Sudoku extends Array {
 		})
 		
 		if (possibleValues.length == 1){
-			this.rows[i][j] = possibleValues[0]
-			return
-		}				
+			return possibleValues[0]
+		}	
+		
+		throw null;
 	}
 	
 

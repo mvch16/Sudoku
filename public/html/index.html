@@ -83,9 +83,12 @@
                 </div>
             </div>
         </div>
-	<div class="col-md-1 col-sm-1 col-xs-1">
+	<div class="col-md-2 col-sm-2 col-xs-2">
+		<button class="btn btn-success btn-block" ng-click="generate()"><i
+         class="icon-ok-sign"></i> Generar nuevo
+        </button>
 		<p>Nivel</p>
-		<select ng-model="selectedLevel" ng-options="x for x in levels"></select>
+		<select ng-model="selectedLevel.levels" ng-options="x for x in levels"></select>
     </div>
 	<div class="col-md-2 col-sm-2 col-xs-1">
 		<button class="btn btn-success btn-block" ng-click="solve()"><i
@@ -93,7 +96,7 @@
         </button>
     </div>
 	<div class="col-md-2 col-sm-2 col-xs-1">
-		<button class="btn btn-success btn-block" ng-click="solve()"><i
+		<button class="btn btn-success btn-block" ng-click="save()"><i
          class="icon-ok-sign"></i> Guardar
         </button>
     </div>

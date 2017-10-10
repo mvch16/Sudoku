@@ -1,0 +1,1 @@
+mongoexport -d sudoku --collection sudoku -c sudoku --out sudoku.json

@@ -4,6 +4,9 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 	$scope.rows = angular.copy(data);	
 	$scope.rows_save = angular.copy(data);
     $scope.levels = ["Facil", "Medio", "Dificil"];
+	$scope.selectedLevel = {
+		levels: $scope.levels[1]
+	}
 	
 	function createEmptyRows() {
 		var rows = angular.copy(data);
@@ -112,5 +115,17 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 		}
 		else
 			alert("can't be solved")
+	};
+	
+	$scope.generate = function(){
+	   $.ajax({url: '/api/generate', 
+			type:'POST',
+			body: { name : $("#inputName").val() }})
+			.done(function(result){
+				alert('SE GENERO CORRECTAMENTE',result)
+			})
+			 .fail(function(e, msg, excpn){
+				 alert('**** AJAX ERROR ' + msg + ' ****');
+			});
 	};
 }); 

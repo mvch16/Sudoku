@@ -11,31 +11,27 @@ const app        = express();
 const morgan     = require('morgan');
 const favicon    = require('express-favicon');
 const mongoose   = require('mongoose');
+const {Sudoku} = require('./public/javascripts/server/Sudoku')
+const {emptyBoard} = require('./public/javascripts/server/emptyBoard')
+
 
 // APP BASIC CONFIGURATION
 app.use(morgan('dev')); // log requests to console
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-let port     = process.env.PORT || 8080; // set  port (default 8080)
-///////////////////////////////////////////////////////////////////////////////
-// CONNECT TO DB
-mongoose.connect('mongodb://localhost/sudokus',
+let port     = process.env.PORT || 8080;
+
+mongoose.connect('mongodb://localhost/sudoku',
                  {
 					 useMongoClient: true
-				 } // See http://mongoosejs.com/docs/connections.html#use-mongo-client
+				 }
 );
 
-// Data model
-const Sudoku     = require('./app/models/sudoku');
-////////////////////////////////////////////////////////////////////////////////
-// API SETUP
+const SudokuBD    = require('./app/models/sudoku');
 
-// 1) Create router
 const router = express.Router();
-// 2) Config paths
 
-// Middleware to use for all requests
 router.use((req, res, next)=> {
 	console.log('General middleware activated');
 	next();
@@ -44,65 +40,57 @@ router.use((req, res, next)=> {
 // Route to test (accessed at GET http://localhost:8080/api)
 router.get('/', function(req, res) {
 	setTimeout( ()=>
-	res.json({ message: '*** Rest API is working fine! ***' }),
+	res.json({ message: '*** Rest API is working fine!***' }),
 	5000)	
 });
 
-// REST API
-// ON /bears
-//    POST (create one)
-//    GET  ( get all)
-// ----------------------------------------------------
-// ***** Notice the "callback hell" *****
-//-----------------------------------------------------
-router.route('/bears')
+router.route('/sudoku')
 	// create a bear (accessed at POST http://localhost:8080/bears)
 	.post((req, res)=> {
 				console.log('POST requested: ' + req.body.name);
-				let bear = new Bear();		// create a new instance of the Bear model
+				let sudoku = new Sudoku();		// create a new instance of the Bear model
 				// Extract data from request
 				console.log('Post body ' + JSON.stringify(req.body))
-				bear.name = req.body.name;  // set the bears name (comes from the request)
+				sudoku.initialSudoku = req.body.initialSudoku;
+				sudoku.level = req.body.level;
+				sudoku.playedSudoku = req.body.playedSudoku// set the bears name (comes from the request)
 										// **** NOTICE: We should avoid potential injection *****
 										// https://en.wikipedia.org/wiki/Code_injection
-				bear.save((err)=> {
+				SudokuBD.save((err)=> {
 							err ? res.send(err) : null;
 							console.log('Post Error = ' + err);
-							res.json({ message: 'Bear created!', bearId : bear._id , name:bear.name});
+							res.json({ message: 'Sudoku guardado correctamente', SudokuId : sudoku._id});
 				});	
 	})
 
-	// get all the bears (accessed at GET http://localhost:8080/api/bears)
 	.get((req, res)=> {
 		console.log('GET requested');
-		Bear.find((err, bears)=> {
+		SudokuBD.find((err, sudoku)=> {
 			err ? res.send(err) : null;
-			res.json(bears);
+			res.json(sudoku);
 		});
 	});
 
-// ON /bears/:bear_id
-// ----------------------------------------------------
-router.route('/bears/:bear_id')
+router.route('/sudoku/:sudoku_id')
 
 	// GET
 	.get((req, res)=> {
-		     Bear.findById(req.params.bear_id, 
-		                   (err, bear)=>{
+		     SudokuBD.findById(req.params.sudoku_id, 
+		                   (err, sudoku)=>{
 							err ? res.send(err) : null;
-						    res.json(bear);
+						    res.json(sudoku);
 		             });
 	 })
 
 	// UPDATE 
 	.put((req, res)=> {
-		Bear.findById(req.params.bear_id,(err, bear)=> {
+		SudokuBD.findById(req.params.sudoku_id,(err, sudoku)=> {
 
 			err ? res.send(err) : null;
-			bear.name = req.body.name;
-			bear.save((err)=> {
+			sudoku.playedSudoku = req.body.playedSudoku;
+			sudoku.save((err)=> {
 				err ? res.send(err) : null;
-				res.json({ status: 'ok', message: 'Bear updated!' });
+				res.json({ status: 'ok', message: 'Sudoku actualizado' });
 			});
 
 		});
@@ -110,13 +98,25 @@ router.route('/bears/:bear_id')
 
 	// DELETE
 	.delete((req, res)=>{
-		Bear.remove({
-			_id: req.params.bear_id
-		},(err, bear)=>{
+		SudokuBD.remove({
+			_id: req.params.sudoku_id
+		},(err, sudoku)=>{
 			err ? res.send(err) : null;
-			res.json({ status: 'ok', message: 'Successfully deleted' });
+			res.json({ status: 'ok', message: 'Sudoku eliminado de forma correcta' });
 		});
 	});
+	
+router.route('/generate')
+	.post((req, res)=> {
+		console.log('POST requested: ' + req.body.name);
+		console.log('Post body ' + JSON.stringify(req.body))
+		let level = 1
+		let m = new emptyBoard()
+		let board = new Sudoku(m,1)
+		board.generateBoard()
+		//Aqui se resuelve el sudoku*/
+		res.json({ message: 'Sudoku generado', sudo:board.rows});
+		});	
 
 ///////////////////////////////////////////////////////////////////////
 // APP settings
