@@ -15,30 +15,30 @@ class Sudoku extends Array {
 	this.rows =m
 	this.level = l
 	}
-	
+
 	row(i){
 		return this.rows[i];
 	}
-	
+
 	col(j){
 		let colums = []
 		this.rows.forEach(row => colums.push(row[j]))
 		return colums
 	}
-	
+
 	cell(i,j){
 		return this.rows[i][j];
 	}
-	
+
 	isEmpty(i,j){
 		return this.rows[i][j] == 0 ? true : false;
 	}
-	
+
 	squareCorner(i,j){
 		let n = this.n / 3
 		return [i-i%n, j-j%n]
 	}
-	
+
 	valuesFromSquareOf(i,j){
 		let n = this.n / 3
 		let values = []
@@ -50,7 +50,7 @@ class Sudoku extends Array {
 		})
 		return values
 	}
-	
+
 	possibleValuesAt(i,j){
 		let current = this.row(i).concat(this.col(j))
 						.concat(this.valuesFromSquareOf(i,j))
@@ -58,19 +58,20 @@ class Sudoku extends Array {
 		return this.range.map(v=> v+1)
 					.filter(x=> current.indexOf(x)==-1)
 	}
-	
+
 	difineClues(){
 		if(this.level == 1)
-			return randLevelHard.next().value
+			return randLevelLow.next().value
 		else if (this.level == 2)
 			return randLevelMedium.next().value
-		else	
-			return randLevelLow.next().value
+		else
+			return randLevelHard.next().value
 	}
-	
-	
+
+
 	generateBoard(){
 		let clues = this.difineClues()
+		console.log(clues)
 		var i=0
 		for(; i<clues;i++){
 			let k = rand.next().value
@@ -82,35 +83,6 @@ class Sudoku extends Array {
 				i--
 		}
 	}
-	
-	
-	findNumber(i,j){
-		let n = this.n / 3
-		let possibleValues = this.possibleValuesAt(i,j);
-		if (possibleValues.length == 1){
-			return possibleValues[0]
-		}
-		
-		let [ib,jb] = this.squareCorner(i,j)
-		this.range.slice(ib,ib+n).forEach(ki=> {
-			this.range.slice(jb,jb + n).forEach(kj=> {			
-				if(this.cell(ki,kj) == 0 ){
-					if(!(ki == i && kj == j)){
-						possibleValues = possibleValues.filter(x=> ! this.possibleValuesAt(ki,kj).includes(x))
-					}
-				}				
-			})
-		})
-		
-		if (possibleValues.length == 1){
-			return possibleValues[0]
-		}	
-		
-		throw null;
-	}
-	
-
-	
 }
 
 

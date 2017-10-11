@@ -10,6 +10,7 @@
     <script src="../javascripts/client/app.js"></script>
     <script src="../javascripts/client/data.js"></script>
     <script src="../javascripts/client/controllers.js"></script>
+	<script src="../javascripts/server/emptyBoard.js"></script>
     <script src="../javascripts/client/filters.js"></script>
 <style type="text/css">
         .margin_left_60 {
@@ -88,7 +89,7 @@
          class="icon-ok-sign"></i> Generar nuevo
         </button>
 		<p>Nivel</p>
-		<select ng-model="selectedLevel.levels" ng-options="x for x in levels"></select>
+		<select ng-model="selectedLevel.levels" ng-options="x.name for x in levels"></select>
     </div>
 	<div class="col-md-2 col-sm-2 col-xs-1">
 		<button class="btn btn-success btn-block" ng-click="solve()"><i

@@ -1,9 +1,8 @@
 Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 	'use strict';
-	
 	$scope.rows = angular.copy(data);	
 	$scope.rows_save = angular.copy(data);
-    $scope.levels = ["Facil", "Medio", "Dificil"];
+    $scope.levels = [{name: "Facil",id:1}, {name: "Medio",id:2}, {name: "Dificil",id:3}];
 	$scope.selectedLevel = {
 		levels: $scope.levels[1]
 	}
@@ -108,18 +107,46 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 	};
 	
 	$scope.solve = function() {
-		var results = solveRows($scope.rows);
-		if(results['state']){
-			$scope.rows = jQuery.extend(true, [], results['rows']);
-			alert("solved");			
+		let m = new emptyBoard()
+		for(var i=0;i<9;i++){
+					for (var j =0;j<9;j++){
+						if($scope.rows[i].columns[j].value =='')
+							m[i][j]=0
+						else
+						m[i][j] = $scope.rows[i].columns[j].value
 		}
-		else
-			alert("can't be solved")
+		}
+		alert(m)
+		try{
+			$.ajax({url:'/api/resolve', 
+			type:'POST',
+			data: {sudoku : m}
+			})
+			.done(function(result){
+				/*var r = angular.copy(data);
+				for(var i=0;i<9;i++){
+					for (var j =0;j<9;j++){
+						if(result.sudoku[i][j]!=0)
+						r[i].columns[j].value = result.sudoku[i][j]
+					}
+				}
+				$scope.rows = r
+				$scope.rows_save = r*/
+				alert('DONE!')
+			})
+			 .fail(function(e, msg, excpn){
+				 alert('**** AJAX ERROR ' + msg + ' ****' );
+			});
+			
+		}catch(err){
+			alert('CATCH!!!!!!')
+		}
 	};
 	
 	$scope.generate = function(){
 	   $.ajax({url:'/api/generate', 
 			type:'POST',
+			data: {nivel : $scope.selectedLevel.levels.id}
 			})
 			.done(function(result){
 				var r = angular.copy(data);
@@ -130,6 +157,7 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 					}
 				}
 				$scope.rows = r
+				$scope.rows_save = r
 			})
 			 .fail(function(e, msg, excpn){
 				 alert('**** AJAX ERROR ' + msg + ' ****' );

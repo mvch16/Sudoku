@@ -11,8 +11,7 @@ const app        = express();
 const morgan     = require('morgan');
 const favicon    = require('express-favicon');
 const mongoose   = require('mongoose');
-const {Sudoku} = require('./public/javascripts/server/Sudoku')
-const {emptyBoard} = require('./public/javascripts/server/emptyBoard')
+
 
 
 // APP BASIC CONFIGURATION
@@ -28,7 +27,7 @@ mongoose.connect('mongodb://localhost/sudoku',
 				 }
 );
 
-const SudokuBD    = require('./app/models/sudoku');
+const SudokuDB    = require('./app/models/Sudoku');
 
 const router = express.Router();
 
@@ -47,27 +46,27 @@ router.get('/', function(req, res) {
 router.route('/sudoku')
 	// create a bear (accessed at POST http://localhost:8080/bears)
 	.post((req, res)=> {
-				console.log('POST requested: ' + req.body.name);
-				let sudoku = new Sudoku();		// create a new instance of the Bear model
+				let sudo = new SudokuDB();		// create a new instance of the Bear model
 				// Extract data from request
 				console.log('Post body ' + JSON.stringify(req.body))
-				sudoku.initialSudoku = req.body.initialSudoku;
-				sudoku.level = req.body.level;
-				sudoku.playedSudoku = req.body.playedSudoku// set the bears name (comes from the request)
+				sudo.initialSudoku = req.body.initialSudoku;
+				sudo.level = req.body.level;
+				sudo.playedSudoku = req.body.playedSudoku// set the bears name (comes from the request)
 										// **** NOTICE: We should avoid potential injection *****
 										// https://en.wikipedia.org/wiki/Code_injection
-				SudokuBD.save((err)=> {
+										console.log(sudo)
+				sudo.save((err)=> {
 							err ? res.send(err) : null;
 							console.log('Post Error = ' + err);
-							res.json({ message: 'Sudoku guardado correctamente', SudokuId : sudoku._id});
+							res.json({ message: 'Sudoku guardado correctamente', sudokuID : sudo._id});
 				});	
 	})
 
 	.get((req, res)=> {
 		console.log('GET requested');
-		SudokuBD.find((err, sudoku)=> {
+		SudokuDB.find((err, sudoku)=> {
 			err ? res.send(err) : null;
-			res.json(sudoku);
+			res.json({message:'encontrado!!!'});
 		});
 	});
 
@@ -107,12 +106,28 @@ router.route('/sudoku/:sudoku_id')
 	});
 	
 router.route('/generate')
-	.post((req, res)=> {
-		let level = 3
+	.post(function(req, res){
+		const {Sudoku} = require('./public/javascripts/server/Sudoku')
+		const {emptyBoard} = require('./public/javascripts/server/emptyBoard')
+		let nivel = req.body.nivel
 		let m = new emptyBoard()
-		let board = new Sudoku(m,1)
+		let board = new Sudoku(m,nivel)
 		board.generateBoard()
 		res.json({message:'Sudoku generado aleatoriamente',sudoku: board.rows});
+		});	
+		
+router.route('/resolve')
+	.post(function(req, res){
+		const {resolve} = require('./public/javascripts/server/sudokuResolver')
+		let m = req.body.sudoku
+		for(var i = 0; i<9;i++){
+			m[i] = m[i].map(function (x) { 
+			return parseInt(x); 
+			});
+		}
+		console.log(m)
+		let k = new resolve(m)
+		res.json({message:'Sudoku resuelto'});
 		});	
 
 ///////////////////////////////////////////////////////////////////////
