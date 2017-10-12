@@ -74,7 +74,7 @@ router.route('/sudoku/:sudoku_id')
 
 	// GET
 	.get((req, res)=> {
-		     SudokuBD.findById(req.params.sudoku_id, 
+		     SudokuDB.findById(req.params.sudoku_id, 
 		                   (err, sudoku)=>{
 							err ? res.send(err) : null;
 						    res.json(sudoku);
@@ -83,7 +83,7 @@ router.route('/sudoku/:sudoku_id')
 
 	// UPDATE 
 	.put((req, res)=> {
-		SudokuBD.findById(req.params.sudoku_id,(err, sudoku)=> {
+		SudokuDB.findById(req.params.sudoku_id,(err, sudoku)=> {
 
 			err ? res.send(err) : null;
 			sudoku.playedSudoku = req.body.playedSudoku;
@@ -120,6 +120,7 @@ router.route('/resolve')
 	.post(function(req, res){
 		const {resolve} = require('./public/javascripts/server/sudokuResolver')
 		let m = req.body.sudoku
+		console.log(m)
 		for(var i = 0; i<9;i++){
 			m[i] = m[i].map(function (x) { 
 			return parseInt(x); 
@@ -127,7 +128,7 @@ router.route('/resolve')
 		}
 		console.log(m)
 		let k = new resolve(m)
-		res.json({message:'Sudoku resuelto'});
+		res.json({message:'Sudoku resuelto', solucion: k});
 		});	
 
 ///////////////////////////////////////////////////////////////////////
