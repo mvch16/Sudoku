@@ -66,7 +66,7 @@ router.route('/sudoku')
 		console.log('GET requested');
 		Sudoku.find((err, sudokus)=> {
 			err ? res.send(err) : null;
-			res.json({message:'encontrado!!!'});
+			res.json({message:'Lista de sudokus', listaSudokus: sudokus});
 		});
 	});
 
@@ -80,7 +80,7 @@ router.route('/sudoku/:sudoku_id')
 						    res.json(sudoku);
 		             });
 	 })
-
+	 
 	// UPDATE 
 	.put((req, res)=> {
 		Sudoku.findById(req.params.sudoku_id,(err, sudoku)=> {
@@ -106,14 +106,21 @@ router.route('/sudoku/:sudoku_id')
 	});
 	
 router.route('/generate')
-	.post(function(req, res){
-		const {Sudoku} = require('./public/javascripts/server/Sudoku')
-		const {emptyBoard} = require('./public/javascripts/server/emptyBoard')
+	.post((req, res)=> {
+		console.log('GET requested');
 		let nivel = req.body.nivel
-		let m = new emptyBoard()
-		let board = new Sudoku(m,nivel)
-		board.generateBoard()
-		res.json({message:'Sudoku generado aleatoriamente',sudoku: board.rows});
+		let s
+		Sudoku.find((err, sudokus)=> {
+			err ? res.send(err) : null;
+			sudokus.forEach(e=>{
+				if(e.level == nivel){
+					s = e
+				}
+			})	
+			console.log(s.initialSudoku)
+			let board = new Sudoku(s.initialSudoku,s.level)
+			res.json({message:'Lista de sudokus', sudoku: board.rows});
+		});
 		});	
 		
 router.route('/resolve')
@@ -130,6 +137,17 @@ router.route('/resolve')
 		res.json({message:'Sudoku resuelto', sudoku: k.rows});
 		});	
 
+/*router.route('/generate')
+	.post(function(req, res){
+		const {Sudoku} = require('./public/javascripts/server/Sudoku')
+		const {emptyBoard} = require('./public/javascripts/server/emptyBoard')
+		let nivel = req.body.nivel
+		let m = new emptyBoard()
+		let board = new Sudoku(m,nivel)
+		board.generateBoard()
+		res.json({message:'Sudoku generado aleatoriamente',sudoku: board.rows});
+		});	*/		
+		
 ///////////////////////////////////////////////////////////////////////
 // APP settings
 // REGISTER STATIC
