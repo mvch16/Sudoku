@@ -68,7 +68,24 @@ function resolve(m){
 		})	  
 		return promise
 	}
-	return evaluateBoard().rows
+	
+	function isReady(){
+		board.rows.forEach((e,i) => {
+			e.forEach((ej,j) => {
+				if(board.rows[i][j] == 0)
+					return true;
+			})
+		})
+		return false
+	}
+	
+	
+	let k =0
+	while(isReady() || k <12){
+	evaluateBoard()	
+	k++
+	}
+	return board
 }
 
 module.exports = {resolve}

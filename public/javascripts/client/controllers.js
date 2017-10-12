@@ -123,7 +123,7 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 			data: {sudoku : m}
 			})
 			.done(function(result){
-				/*var r = angular.copy(data);
+				var r = angular.copy(data);
 				for(var i=0;i<9;i++){
 					for (var j =0;j<9;j++){
 						if(result.sudoku[i][j]!=0)
@@ -131,8 +131,7 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 					}
 				}
 				$scope.rows = r
-				$scope.rows_save = r*/
-				alert('DONE!')
+				$scope.rows_save = r
 			})
 			 .fail(function(e, msg, excpn){
 				 alert('**** AJAX ERROR ' + msg + ' ****' );

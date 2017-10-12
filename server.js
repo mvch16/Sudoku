@@ -21,13 +21,13 @@ app.use(bodyParser.json());
 
 let port     = process.env.PORT || 8080;
 
-mongoose.connect('mongodb://localhost/sudoku',
+mongoose.connect('mongodb://localhost/sudokus',
                  {
 					 useMongoClient: true
 				 }
 );
 
-const SudokuDB    = require('./app/models/Sudoku');
+const Sudoku    = require('./app/models/sudoku');
 
 const router = express.Router();
 
@@ -46,25 +46,25 @@ router.get('/', function(req, res) {
 router.route('/sudoku')
 	// create a bear (accessed at POST http://localhost:8080/bears)
 	.post((req, res)=> {
-				let sudo = new SudokuDB();		// create a new instance of the Bear model
+				let sudoku = new Sudoku();		// create a new instance of the Bear model
 				// Extract data from request
 				console.log('Post body ' + JSON.stringify(req.body))
-				sudo.initialSudoku = req.body.initialSudoku;
-				sudo.level = req.body.level;
-				sudo.playedSudoku = req.body.playedSudoku// set the bears name (comes from the request)
+				sudoku.initialSudoku = req.body.initialSudoku;
+				sudoku.level = req.body.level;
+				sudoku.playedSudoku = req.body.playedSudoku// set the bears name (comes from the request)
 										// **** NOTICE: We should avoid potential injection *****
 										// https://en.wikipedia.org/wiki/Code_injection
-										console.log(sudo)
-				sudo.save((err)=> {
+										console.log(sudoku)
+				sudoku.save((err)=> {
 							err ? res.send(err) : null;
 							console.log('Post Error = ' + err);
-							res.json({ message: 'Sudoku guardado correctamente', sudokuID : sudo._id});
+							res.json({ message: 'Sudoku guardado correctamente', sudokuID : sudoku._id});
 				});	
 	})
 
 	.get((req, res)=> {
 		console.log('GET requested');
-		SudokuDB.find((err, sudoku)=> {
+		Sudoku.find((err, sudokus)=> {
 			err ? res.send(err) : null;
 			res.json({message:'encontrado!!!'});
 		});
@@ -74,7 +74,7 @@ router.route('/sudoku/:sudoku_id')
 
 	// GET
 	.get((req, res)=> {
-		     SudokuDB.findById(req.params.sudoku_id, 
+		     Sudoku.findById(req.params.sudoku_id, 
 		                   (err, sudoku)=>{
 							err ? res.send(err) : null;
 						    res.json(sudoku);
@@ -83,7 +83,7 @@ router.route('/sudoku/:sudoku_id')
 
 	// UPDATE 
 	.put((req, res)=> {
-		SudokuDB.findById(req.params.sudoku_id,(err, sudoku)=> {
+		Sudoku.findById(req.params.sudoku_id,(err, sudoku)=> {
 
 			err ? res.send(err) : null;
 			sudoku.playedSudoku = req.body.playedSudoku;
@@ -97,7 +97,7 @@ router.route('/sudoku/:sudoku_id')
 
 	// DELETE
 	.delete((req, res)=>{
-		SudokuBD.remove({
+		Sudoku.remove({
 			_id: req.params.sudoku_id
 		},(err, sudoku)=>{
 			err ? res.send(err) : null;
@@ -126,9 +126,8 @@ router.route('/resolve')
 			return parseInt(x); 
 			});
 		}
-		console.log(m)
 		let k = new resolve(m)
-		res.json({message:'Sudoku resuelto', solucion: k});
+		res.json({message:'Sudoku resuelto', sudoku: k.rows});
 		});	
 
 ///////////////////////////////////////////////////////////////////////
