@@ -12,8 +12,6 @@ function emptyBoard(){
 			]
 }
 
-module.exports = {emptyBoard}
-
 /*
 
 	return board = [

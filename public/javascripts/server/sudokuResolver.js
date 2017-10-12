@@ -59,16 +59,6 @@ function resolve(m){
 		return board
 	}
 	
-	function mostrarCuadro () {
-		const promise = new Promise(function (resolve, reject) {
-			setTimeout(function() {
-				console.log('RESULTADO')
-				console.log(board.rows)
-			}, 1);
-		})	  
-		return promise
-	}
-	
 	function isReady(){
 		board.rows.forEach((e,i) => {
 			e.forEach((ej,j) => {

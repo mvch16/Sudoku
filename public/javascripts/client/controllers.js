@@ -6,25 +6,7 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 	$scope.selectedLevel = {
 		levels: $scope.levels[1]
 	}
-	//alert(JSON.stringify(data[0].columns[3]))
-	function createEmptyRows() {
-		var rows = angular.copy(data);
-		for (var l=0; l<9; l++)
-			for(var c=0; c<9; c++){
-				rows[l].columns[c].value = "";
-				rows[l].columns[c].class = "";	
-			}
-		return rows;
-	}
 
-	function isSolved(rows)
-	{
-		for(var i = 0; i < 9; i++)
-			for(var k=0; k<9; k++)
-				if(rows[i].columns[k].value === "")
-					return false;
-		return true;
-	}
 
 	function changeClass(old_class, new_class) {
         if (old_class === "correct")
@@ -32,10 +14,6 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
         else
         	return new_class;        
     }
-	
-	$scope.getLevel = function(level){
-		
-	}
    
 	$scope.getValue = function(value, rowId, columnId) {
         rowId -= 1;
@@ -47,10 +25,6 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 			return "";		
 		}		
 		return value;		
-	};
-
-	$scope.init = function() {		
-		$scope.rows = jQuery.extend(true, [], $scope.rows_save);
 	};
 	
 	$scope.clear = function() {		
@@ -86,25 +60,9 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 	            $scope.rows[j].columns[columnId].class = changeClass("error", $scope.rows[j].columns[columnId].class);
 	           }
 	    }
-	    var edges = getCaseEdgesByCoords(rowId, columnId);
-	    		
-        for(var j = edges.row.min; j < edges.row.max; j++)
-            for(var k=edges.column.min; k<edges.column.max; k++)
-            {
-                if((value == $scope.rows[j].columns[k].value) && j != rowId && k != columnId){
-					$scope.rows[rowId].columns[columnId].class = changeClass($scope.rows[rowId].columns[columnId].class,"error");
-	            	$scope.rows[j].columns[k].class = changeClass($scope.rows[j].columns[k].class, "error");
-	            	}
-            }	    	   		
+   	   		
    	};
-   	   	   
-	$scope.possibilities = function(row_id, column_id) {
-		row_id = row_id - 1;
-		column_id = column_id - 1;
-		var pos = getPossibilities($scope.rows, row_id, column_id);
-		$scope.rows[row_id].columns[column_id].possibilities = angular.copy(pos);
-		$scope.currentPossibilities = angular.copy(pos);
-	};
+
 	
 	$scope.solve = function() {
 		let m = new emptyBoard()
@@ -116,8 +74,6 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 						m[i][j] = $scope.rows[i].columns[j].value
 		}
 		}
-		alert(m)
-		try{
 			$.ajax({url:'/api/resolve', 
 			type:'POST',
 			data: {sudoku : m}
@@ -134,12 +90,8 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 				$scope.rows_save = r
 			})
 			 .fail(function(e, msg, excpn){
-				 alert('**** AJAX ERROR ' + msg + ' ****' );
+								 alert('**** AJAX ERROR ' + msg + ' ****' );
 			});
-			
-		}catch(err){
-			alert('CATCH!!!!!!')
-		}
 	};
 	
 	$scope.generate = function(){
@@ -162,4 +114,51 @@ Sudoku.controller('SudokuController', function SudokuController($scope, data) {
 				 alert('**** AJAX ERROR ' + msg + ' ****' );
 			});
 	};
+	
+	$scope.load = function(){
+	   $.ajax({url:'/api/load', 
+			type:'POST',
+			data: {nivel : $scope.selectedLevel.levels.id}
+			})
+			.done(function(result){
+				var r = angular.copy(data);
+				alert(JSON.stringify(result.sudoku[1][1]))
+				for(var i=0;i<9;i++){
+					for (var j =0;j<9;j++){
+						if(result.sudoku[i][j]!=0)
+						r[i].columns[j].value = result.sudoku[i][j]
+					}
+				}
+				$scope.rows = r
+				$scope.rows_save = r
+			})
+			 .fail(function(e, msg, excpn){
+				 alert('**** AJAX ERROR ' + msg + ' ****' );
+			});
+	};
+	
+	$scope.save = function(){
+				let m = new emptyBoard()
+		for(var i=0;i<9;i++){
+					for (var j =0;j<9;j++){
+						if($scope.rows[i].columns[j].value =='')
+							m[i][j]=0
+						else
+						m[i][j] = $scope.rows[i].columns[j].value
+		}
+		}
+	   $.ajax({url:'/api/sudoku', 
+			type:'POST',
+			data: {playedSudoku:m}
+			})
+			.done(function(result){
+				alert('DOM@#')
+				$scope.clear()
+			})
+			 .fail(function(e, msg, excpn){
+				 alert('**** AJAX ERROR ' + msg + ' ****' );
+			});
+	};
+	
+	
 }); 

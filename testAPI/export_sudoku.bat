@@ -1,1 +1,1 @@
-mongoexport -d sudokus --fields initialSudoku -c sudokus --out sudokus.json
+mongoexport -d sudokus --collections -c sudokus --out sudokus.json

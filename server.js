@@ -12,10 +12,7 @@ const morgan     = require('morgan');
 const favicon    = require('express-favicon');
 const mongoose   = require('mongoose');
 
-
-
-// APP BASIC CONFIGURATION
-app.use(morgan('dev')); // log requests to console
+app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -36,7 +33,6 @@ router.use((req, res, next)=> {
 	next();
 });
 
-// Route to test (accessed at GET http://localhost:8080/api)
 router.get('/', function(req, res) {
 	setTimeout( ()=>
 	res.json({ message: '*** Rest API is working fine!***' }),
@@ -44,21 +40,13 @@ router.get('/', function(req, res) {
 });
 
 router.route('/sudoku')
-	// create a bear (accessed at POST http://localhost:8080/bears)
 	.post((req, res)=> {
-				let sudoku = new Sudoku();		// create a new instance of the Bear model
-				// Extract data from request
-				console.log('Post body ' + JSON.stringify(req.body))
-				sudoku.initialSudoku = req.body.initialSudoku;
-				sudoku.level = req.body.level;
-				sudoku.playedSudoku = req.body.playedSudoku// set the bears name (comes from the request)
-										// **** NOTICE: We should avoid potential injection *****
-										// https://en.wikipedia.org/wiki/Code_injection
-										console.log(sudoku)
+				let sudoku = new Sudoku();
+				sudoku.playedSudoku = req.body.playedSudoku
 				sudoku.save((err)=> {
 							err ? res.send(err) : null;
 							console.log('Post Error = ' + err);
-							res.json({ message: 'Sudoku guardado correctamente', sudokuID : sudoku._id});
+							res.json({ message: 'Sudoku guardado correctamente'});
 				});	
 	})
 
@@ -104,40 +92,19 @@ router.route('/sudoku/:sudoku_id')
 			res.json({ status: 'ok', message: 'Sudoku eliminado de forma correcta' });
 		});
 	});
-	
-router.route('/generate')
-	.post((req, res)=> {
-		console.log('GET requested');
-		let nivel = req.body.nivel
-		let s
-		Sudoku.find((err, sudokus)=> {
-			err ? res.send(err) : null;
-			sudokus.forEach(e=>{
-				if(e.level == nivel){
-					s = e
-				}
-			})	
-			console.log(s.initialSudoku)
-			let board = new Sudoku(s.initialSudoku,s.level)
-			res.json({message:'Lista de sudokus', sudoku: board.rows});
-		});
-		});	
 		
 router.route('/resolve')
 	.post(function(req, res){
 		const {resolve} = require('./public/javascripts/server/sudokuResolver')
 		let m = req.body.sudoku
-		console.log(m)
-		for(var i = 0; i<9;i++){
-			m[i] = m[i].map(function (x) { 
-			return parseInt(x); 
-			});
-		}
+		m.forEach((i,ki) => {
+			m[ki] = m[ki].map(x=> parseInt(x))
+		})
 		let k = new resolve(m)
 		res.json({message:'Sudoku resuelto', sudoku: k.rows});
 		});	
 
-/*router.route('/generate')
+router.route('/generate')
 	.post(function(req, res){
 		const {Sudoku} = require('./public/javascripts/server/Sudoku')
 		const {emptyBoard} = require('./public/javascripts/server/emptyBoard')
@@ -146,7 +113,20 @@ router.route('/resolve')
 		let board = new Sudoku(m,nivel)
 		board.generateBoard()
 		res.json({message:'Sudoku generado aleatoriamente',sudoku: board.rows});
-		});	*/		
+		});	
+
+router.route('/load')
+	.post(function(req, res){
+		Sudoku.find((err, sudokus)=> {
+			const {Sudoku} = require('./public/javascripts/server/Sudoku')
+			err ? res.send(err) : null;
+			let board = new Sudoku(sudokus[0].initialSudoku,1)
+			let gg = JSON.stringify(sudokus[0].initialSudoku)
+			console.log(gg[0][0])
+			console.log(board.rows)
+			res.json({sudoku:board.rows})
+		});
+	});	
 		
 ///////////////////////////////////////////////////////////////////////
 // APP settings
